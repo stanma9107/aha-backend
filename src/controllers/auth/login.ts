@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { redirect } from '../../utils/response';
 
 export default (req: FastifyRequest, res: FastifyReply) => {
-  const scopes = 'openid profile email';
+  const scopes = 'openid profile email offline_access';
   const query = new URLSearchParams({
     response_type: 'code',
     client_id: process.env.AUTH0_CLIENT_ID ?? '',
