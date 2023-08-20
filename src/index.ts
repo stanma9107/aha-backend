@@ -2,6 +2,8 @@ import fastify from 'fastify';
 import cors from '@fastify/cors';
 import dotenv from 'dotenv';
 
+import routes from './routes';
+
 dotenv.config();
 
 const server = fastify({
@@ -16,6 +18,17 @@ const port = (process.env.PORT || 8080) as number;
 // Setup CORS
 server.register(cors, {
   origin: '*',
+});
+
+// Setup Routes
+routes.forEach((routePackage) => {
+  routePackage.routes.forEach((route) => {
+    server.route({
+      method: route.method,
+      url: `${routePackage.prefix}/${route.path}`,
+      handler: route.handler,
+    });
+  });
 });
 
 // Start Server
