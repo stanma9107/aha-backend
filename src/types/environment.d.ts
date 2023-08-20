@@ -13,6 +13,7 @@ declare global {
       AUTH0_DOMAIN: string;
       AUTH0_CLIENT_ID: string;
       AUTH0_CLIENT_SECRET: string;
+      COOKIE_SECRET: string;
     }
   }
 }

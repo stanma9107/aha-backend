@@ -1,6 +1,7 @@
 import fastify from 'fastify';
 import cors from '@fastify/cors';
 import dotenv from 'dotenv';
+import cookie from '@fastify/cookie';
 
 import routes from './routes';
 
@@ -29,6 +30,12 @@ routes.forEach((routePackage) => {
       handler: route.handler,
     });
   });
+});
+
+// Setup cookie
+server.register(cookie, {
+  secret: process.env.COOKIE_SECRET,
+  parseOptions: {},
 });
 
 // Start Server
