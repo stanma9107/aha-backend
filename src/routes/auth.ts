@@ -7,6 +7,11 @@ const routes: Route[] = [
     method: RequestMethod.GET,
     handler: authController.login,
   },
+  {
+    path: 'check',
+    method: RequestMethod.GET,
+    handler: authController.check,
+  },
 ];
 
 export default routes;
