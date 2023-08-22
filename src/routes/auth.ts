@@ -12,6 +12,11 @@ const routes: Route[] = [
     method: RequestMethod.GET,
     handler: authController.check,
   },
+  {
+    path: 'callback',
+    method: RequestMethod.GET,
+    handler: authController.callback,
+  },
 ];
 
 export default routes;
