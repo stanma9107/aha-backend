@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { EventType } from '@prisma/client';
+import { EventType, UserSource } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { redirect } from '../../utils/response';
 import auth0 from '../../utils/auth0';
@@ -74,7 +74,7 @@ export default async (req: FastifyRequest<{
       data: {
         user_id: user.id,
         session_id: userData.sid,
-        verified: (user.source !== 'EMAIL'),
+        verified: (user.source !== UserSource.EMAIL),
       },
     });
 
