@@ -17,6 +17,11 @@ const routes: Route[] = [
     method: RequestMethod.GET,
     handler: authController.callback,
   },
+  {
+    path: 'logout',
+    method: RequestMethod.GET,
+    handler: authController.logout,
+  },
 ];
 
 export default routes;
