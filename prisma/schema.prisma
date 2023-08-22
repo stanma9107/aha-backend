@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+enum UserSource {
+  GOOGLE
+  FACEBOOK
+  EMAIL
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  auth0_id  String   @unique
+  name      String?
+  email     String?
+  source    UserSource
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sessions  Sessions[]
+  events    EventHistory[]
+}
+
+enum EventType {
+  SIGNUP
+  LOGIN
+  CREATE_SESSION
+  REFRESH_SESSION
+  LOGOUT
+}
+
+model EventHistory {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  user        User     @relation(fields: [user_id], references: [id])
+  event_type  EventType
+}
+
+model Sessions {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  user        User     @relation(fields: [user_id], references: [id])
+  session_id  String   @unique
+  verified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
