@@ -18,7 +18,7 @@ const port = (process.env.PORT || 8080) as number;
 
 // Setup CORS
 server.register(cors, {
-  origin: (process.env.ENV === 'development') ? 'http://localhost:5173' : 'https://aha-api.stanma.dev',
+  origin: (process.env.ENV === 'development') ? 'http://localhost:5173' : 'https://aha.stanma.dev',
   credentials: true,
 });
 
