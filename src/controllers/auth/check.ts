@@ -1,10 +1,18 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { forbidden, success, unauthorized } from '../../utils/response';
+import { EventType } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
+import {
+  badRequest,
+  forbidden,
+  success,
+  unauthorized,
+} from '../../utils/response';
 import auth0 from '../../utils/auth0';
+import prisma from '../../utils/prisma';
 
 export default async (req: FastifyRequest, res: FastifyReply) => {
   const token = req.cookies.access_token;
-  const sessionId = req.cookies.session_id;
+  const activeSessionId = req.cookies.session_id;
 
   // Check if token exists
   if (!token) {
@@ -19,6 +27,64 @@ export default async (req: FastifyRequest, res: FastifyReply) => {
   if (!decoded.isValid) {
     return forbidden(res, {
       message: 'Forbidden',
+    });
+  }
+
+  // Check if session exists
+  if (!activeSessionId) {
+    // define user source & id
+    const source = decoded.decoded?.sub.split('|')[0] ?? '';
+    const userId = decoded.decoded?.sub.split('|')[1] ?? '';
+    const user = await prisma.user.findUnique({
+      where: {
+        auth0_id: userId,
+        source: auth0.getSource(source),
+      },
+    });
+
+    if (!user) {
+      return badRequest(res, {
+        message: 'User does not exist',
+      });
+    }
+
+    // Find Session in database
+    const session = await prisma.sessions.findUnique({
+      where: {
+        session_id: decoded.decoded?.sid,
+      },
+    });
+
+    if (!session) {
+      return unauthorized(res, {
+        message: 'Unauthorized (Session Expired)',
+      });
+    }
+
+    // Create session
+    const activeSession = await prisma.activeSessions.create({
+      data: {
+        user_id: user?.id,
+        session_id: session.id,
+        active_id: uuidv4(),
+      },
+    });
+
+    // Create event history for create active session
+    await prisma.eventHistory.create({
+      data: {
+        event_type: EventType.CREATE_SESSION,
+        user_id: user.id,
+        active_session_id: activeSession.id,
+      },
+    });
+
+    // Store session id in cookie
+    res.setCookie('session_id', activeSession.active_id, {
+      sameSite: true,
+      secure: (process.env.ENV !== 'development'),
+      httpOnly: true,
+      path: '/',
     });
   }
   return success(res, {
