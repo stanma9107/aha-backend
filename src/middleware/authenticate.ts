@@ -21,12 +21,21 @@ export default async (req: FastifyRequest, res: FastifyReply) => {
     return unauthorized(res, 'Unauthorized');
   }
 
+  const userId = checkToken.decoded?.sub.split('|')[1];
+
   // validate session_id from prisma
   const activeSession = await prisma.activeSessions.findUnique({
     where: {
       active_id: activeSessionId,
+      user: {
+        auth0_id: userId,
+      },
+      session: {
+        verified: true,
+      },
     },
   });
+
   if (!activeSession) {
     return forbidden(res, 'Forbidden');
   }
