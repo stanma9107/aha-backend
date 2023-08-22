@@ -18,15 +18,16 @@ enum UserSource {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  auth0_id  String   @unique
-  name      String?
-  email     String?
-  source    UserSource
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  sessions  Sessions[]
-  events    EventHistory[]
+  id              Int      @id @default(autoincrement())
+  auth0_id        String   @unique
+  name            String?
+  email           String?
+  source          UserSource
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  sessions        Sessions[]
+  events          EventHistory[]
+  activeSessions  ActiveSessions[]
 }
 
 enum EventType {
@@ -38,18 +39,37 @@ enum EventType {
 }
 
 model EventHistory {
-  id          Int      @id @default(autoincrement())
-  user_id     Int
-  user        User     @relation(fields: [user_id], references: [id])
-  event_type  EventType
+  id                Int             @id @default(autoincrement())
+  user_id           Int
+  user              User            @relation(fields: [user_id], references: [id])
+  event_type        EventType
+  session_id        Int?
+  session           Sessions?       @relation(fields: [session_id], references: [id])
+  active_session_id Int?
+  active_session    ActiveSessions? @relation(fields: [active_session_id], references: [id])
+  createdAt         DateTime        @default(now())
 }
 
 model Sessions {
-  id          Int      @id @default(autoincrement())
+  id              Int               @id @default(autoincrement())
+  user_id         Int
+  user            User              @relation(fields: [user_id], references: [id])
+  session_id      String            @unique
+  verified        Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  event           EventHistory[]
+  activeSessions  ActiveSessions[]
+}
+
+model ActiveSessions {
+  id          Int             @id @default(autoincrement())
+  active_id   String          @unique
   user_id     Int
-  user        User     @relation(fields: [user_id], references: [id])
-  session_id  String   @unique
-  verified    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  user        User            @relation(fields: [user_id], references: [id])
+  session_id  Int
+  session     Sessions        @relation(fields: [session_id], references: [id])
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  event       EventHistory[]
 }

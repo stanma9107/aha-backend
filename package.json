@@ -15,6 +15,7 @@
   "devDependencies": {
     "@types/auth0": "^3.3.3",
     "@types/node": "^20.4.5",
+    "@types/uuid": "^9.0.2",
     "eslint": "^8.46.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-base": "^15.0.0",
@@ -42,6 +43,7 @@
     "axios": "^1.4.0",
     "dotenv": "^16.3.1",
     "fastify": "^4.21.0",
-    "jsonwebtoken": "^9.0.1"
+    "jsonwebtoken": "^9.0.1",
+    "uuid": "^9.0.0"
   }
 }
