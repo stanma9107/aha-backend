@@ -27,5 +27,6 @@ export default async (req: FastifyRequest, res: FastifyReply) => {
 
   return success(res, {
     name: user.name ?? userData.nickname,
+    picture: userData.picture ?? undefined,
   });
 };
