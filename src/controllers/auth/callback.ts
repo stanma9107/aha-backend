@@ -61,8 +61,16 @@ export default async (req: FastifyRequest<{
       },
     });
 
+    // Find existing session
+    const sessionExists = await prisma.sessions.findUnique({
+      where: {
+        user_id: user.id,
+        session_id: userData.sid,
+      },
+    });
+
     // Create session
-    const session = await prisma.sessions.create({
+    const session = (sessionExists) || await prisma.sessions.create({
       data: {
         user_id: user.id,
         session_id: userData.sid,
