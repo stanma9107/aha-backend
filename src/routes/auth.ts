@@ -1,27 +1,13 @@
-import { RequestMethod, Route } from '../types/routes';
+import { FastifyPluginCallback } from 'fastify';
 import authController from '../controllers/auth';
 
-const routes: Route[] = [
-  {
-    path: 'login',
-    method: RequestMethod.GET,
-    handler: authController.login,
-  },
-  {
-    path: 'check',
-    method: RequestMethod.GET,
-    handler: authController.check,
-  },
-  {
-    path: 'callback',
-    method: RequestMethod.GET,
-    handler: authController.callback,
-  },
-  {
-    path: 'logout',
-    method: RequestMethod.GET,
-    handler: authController.logout,
-  },
-];
+const authRoutes: FastifyPluginCallback = async (fastify, _otps, done) => {
+  fastify.get('/login', authController.login);
+  fastify.get('/check', authController.check);
+  fastify.get('/callback', authController.callback);
+  fastify.get('/logout', authController.logout);
 
-export default routes;
+  done();
+};
+
+export default authRoutes;

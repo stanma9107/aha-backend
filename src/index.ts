@@ -3,7 +3,7 @@ import cors from '@fastify/cors';
 import dotenv from 'dotenv';
 import cookie from '@fastify/cookie';
 
-import routes from './routes';
+import authRoutes from './routes/auth';
 
 dotenv.config();
 
@@ -23,14 +23,8 @@ server.register(cors, {
 });
 
 // Setup Routes
-routes.forEach((routePackage) => {
-  routePackage.routes.forEach((route) => {
-    server.route({
-      method: route.method,
-      url: `${routePackage.prefix}/${route.path}`,
-      handler: route.handler,
-    });
-  });
+server.register(authRoutes, {
+  prefix: '/auth',
 });
 
 // Setup cookie
