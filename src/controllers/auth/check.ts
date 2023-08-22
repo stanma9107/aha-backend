@@ -4,6 +4,7 @@ import auth0 from '../../utils/auth0';
 
 export default async (req: FastifyRequest, res: FastifyReply) => {
   const token = req.cookies.access_token;
+  const sessionId = req.cookies.session_id;
 
   // Check if token exists
   if (!token) {
@@ -15,7 +16,7 @@ export default async (req: FastifyRequest, res: FastifyReply) => {
   // Check if token is valid
   const decoded = auth0.validateToken(token);
 
-  if (!decoded) {
+  if (!decoded.isValid) {
     return forbidden(res, {
       message: 'Forbidden',
     });
