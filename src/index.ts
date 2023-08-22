@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cookie from '@fastify/cookie';
 
 import authRoutes from './routes/auth';
+import memberRoutes from './routes/member';
 
 dotenv.config();
 
@@ -25,6 +26,9 @@ server.register(cors, {
 // Setup Routes
 server.register(authRoutes, {
   prefix: '/auth',
+});
+server.register(memberRoutes, {
+  prefix: '/member',
 });
 
 // Setup cookie
