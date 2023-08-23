@@ -41,6 +41,7 @@ export default async (req: FastifyRequest<{
         auth0_id: userId,
         source: auth0.getSource(source),
         email: userData.email,
+        name: userData.name,
       },
     });
 
