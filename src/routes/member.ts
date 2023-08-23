@@ -6,6 +6,7 @@ const authRoutes: FastifyPluginCallback = async (fastify, _otps, done) => {
   fastify.addHook('preHandler', withAuthenticateMiddleware);
 
   fastify.get('/', memberController.getProfile);
+  fastify.put('/', memberController.updateProfile);
   done();
 };
 
