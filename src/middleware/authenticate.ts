@@ -34,11 +34,16 @@ export default async (req: FastifyRequest, res: FastifyReply) => {
         verified: true,
       },
     },
+    include: {
+      user: true,
+    },
   });
 
   if (!activeSession) {
     return forbidden(res, 'Forbidden');
   }
+
+  req.user = activeSession.user;
 
   return true;
 };

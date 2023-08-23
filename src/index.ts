@@ -3,10 +3,17 @@ import cors from '@fastify/cors';
 import dotenv from 'dotenv';
 import cookie from '@fastify/cookie';
 
+import { User } from '@prisma/client';
 import authRoutes from './routes/auth';
 import memberRoutes from './routes/member';
 
 dotenv.config();
+
+declare module 'fastify' {
+  interface FastifyRequest {
+    user: User,
+  }
+}
 
 const server = fastify({
   logger: {
@@ -22,6 +29,9 @@ server.register(cors, {
   origin: (process.env.ENV === 'development') ? 'http://localhost:5173' : 'https://aha.stanma.dev',
   credentials: true,
 });
+
+// Setup Decorators
+server.decorateRequest('user', null);
 
 // Setup Routes
 server.register(authRoutes, {
