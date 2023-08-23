@@ -46,9 +46,17 @@ export default async (req: FastifyRequest<{
     });
 
     // Create event history for registration
+    if (!userExists) {
+      await prisma.eventHistory.create({
+        data: {
+          event_type: EventType.SIGNUP,
+          user_id: user.id,
+        },
+      });
+    }
     await prisma.eventHistory.create({
       data: {
-        event_type: (userExists) ? EventType.LOGIN : EventType.SIGNUP,
+        event_type: EventType.LOGIN,
         user_id: user.id,
       },
     });
