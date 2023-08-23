@@ -6,6 +6,7 @@ import cookie from '@fastify/cookie';
 import { User } from '@prisma/client';
 import authRoutes from './routes/auth';
 import memberRoutes from './routes/member';
+import dashboardRoutes from './routes/dashboard';
 
 dotenv.config();
 
@@ -39,6 +40,9 @@ server.register(authRoutes, {
 });
 server.register(memberRoutes, {
   prefix: '/member',
+});
+server.register(dashboardRoutes, {
+  prefix: '/dashboard',
 });
 
 // Setup cookie
