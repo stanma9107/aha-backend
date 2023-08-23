@@ -30,11 +30,12 @@ export default async (req: FastifyRequest, res: FastifyReply) => {
     });
   }
 
+  const source = decoded.decoded?.sub.split('|')[0] ?? '';
+  const userId = decoded.decoded?.sub.split('|')[1] ?? '';
+
   // Check if session exists
   if (!activeSessionId) {
     // define user source & id
-    const source = decoded.decoded?.sub.split('|')[0] ?? '';
-    const userId = decoded.decoded?.sub.split('|')[1] ?? '';
     const user = await prisma.user.findUnique({
       where: {
         auth0_id: userId,
@@ -86,8 +87,30 @@ export default async (req: FastifyRequest, res: FastifyReply) => {
       httpOnly: true,
       path: '/',
     });
+
+    return success(res, {
+      isVerified: session.verified,
+    });
   }
+  const activeSession = await prisma.activeSessions.findUnique({
+    where: {
+      active_id: activeSessionId,
+      user: {
+        auth0_id: userId,
+      },
+    },
+    include: {
+      session: true,
+    },
+  });
+
+  if (!activeSession) {
+    return forbidden(res, {
+      message: 'Forbidden',
+    });
+  }
+
   return success(res, {
-    message: 'Valid token',
+    isVerified: activeSession.session.verified,
   });
 };
