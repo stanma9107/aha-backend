@@ -24,15 +24,6 @@ export default async (req: FastifyRequest<{
       expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
     });
 
-    // Set cookie for refresh_token
-    res.setCookie('refresh_token', token.refreshToken, {
-      sameSite: true,
-      httpOnly: true,
-      secure: process.env.ENV !== 'development',
-      path: '/',
-      expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
-    });
-
     // Get user data & check if user exists in database
     const userData = auth0.decodeToken(token.idToken);
     const source = userData.sub.split('|')[0] ?? '';

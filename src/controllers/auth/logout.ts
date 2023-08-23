@@ -4,7 +4,6 @@ import { redirect } from '../../utils/response';
 export default (req: FastifyRequest, res: FastifyReply) => {
   // Remove cookies
   res.clearCookie('access_token');
-  res.clearCookie('refresh_token');
   res.clearCookie('session_id');
 
   // Generate Auth0 logout link
