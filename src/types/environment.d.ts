@@ -12,6 +12,8 @@ declare global {
       FRONTEND_DOMAIN: string;
       DATABASE_URL: string;
       SHADOW_DATABASE_URL: string;
+      SENDGRID_API_KEY: string;
+      SENDGRID_FROM_EMAIL: string;
     }
   }
 }

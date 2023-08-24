@@ -1,9 +1,10 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { EventType, UserSource } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
-import { redirect } from '../../utils/response';
+import { internalServerError, redirect } from '../../utils/response';
 import auth0 from '../../utils/auth0';
 import prisma from '../../utils/prisma';
+import sendgrid from '../../utils/sendgrid';
 
 interface IQueryString {
   code: string;
@@ -70,13 +71,29 @@ export default async (req: FastifyRequest<{
     });
 
     // Create session
+    const verifiedToken = uuidv4();
     const session = (sessionExists) || await prisma.sessions.create({
       data: {
         user_id: user.id,
         session_id: userData.sid,
         verified: (user.source !== UserSource.EMAIL),
+        verifiedToken,
       },
     });
+
+    // Send verification email if user is not verified
+    if (!session.verified && user.email) {
+      const sendEmail = await sendgrid.sendEmail(
+        user.email,
+        'Verify your session',
+        `Click this link to verify your session: ${process.env.ENV === 'development' ? 'http://localhost:3000' : 'https://aha-api.stanma.dev'}/auth/verify/${session.verifiedToken}`,
+      );
+      if (!sendEmail.sent) {
+        return internalServerError(res, {
+          message: 'Failed to send email',
+        });
+      }
+    }
 
     // Create active session
     const activeSession = await prisma.activeSessions.create({

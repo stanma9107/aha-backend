@@ -56,6 +56,7 @@ model Sessions {
   user            User              @relation(fields: [user_id], references: [id])
   session_id      String            @unique
   verified        Boolean           @default(false)
+  verifiedToken   String?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   event           EventHistory[]
