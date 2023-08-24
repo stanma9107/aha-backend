@@ -34,15 +34,15 @@ export default async (req: FastifyRequest, res: FastifyReply) => {
     },
   });
 
-  const totalActiveSessionLastSevenDaysSum = lastSevenDaysActiveSessionRolling.reduce(
+  const totalActiveSessionLastSevenDaysSum = Math.round((lastSevenDaysActiveSessionRolling.reduce(
     // eslint-disable-next-line no-underscore-dangle
     (acc, cur) => acc + cur._count._all,
     0,
-  );
+  ) / 7) * 1000) / 1000;
 
   return success(res, {
     signUpCount,
     todayActiveSession: totalActiveSessionTodaySum,
-    avarageLastSevenDaysActiveSessionRolling: totalActiveSessionLastSevenDaysSum / 7,
+    avarageLastSevenDaysActiveSessionRolling: totalActiveSessionLastSevenDaysSum,
   });
 };
