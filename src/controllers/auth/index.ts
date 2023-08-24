@@ -3,6 +3,7 @@ import check from './check';
 import callback from './callback';
 import logout from './logout';
 import resend from './resend';
+import verify from './verify';
 
 export default {
   login,
@@ -10,4 +11,5 @@ export default {
   callback,
   logout,
   resend,
+  verify,
 };

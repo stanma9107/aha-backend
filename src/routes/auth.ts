@@ -7,6 +7,7 @@ const authRoutes: FastifyPluginCallback = async (fastify, _otps, done) => {
   fastify.get('/callback', authController.callback);
   fastify.get('/logout', authController.logout);
   fastify.post('/resend', authController.resend);
+  fastify.get('/verify/:verifiedToken', authController.verify);
 
   done();
 };
