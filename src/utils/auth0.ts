@@ -19,7 +19,6 @@ interface JwtPayload {
 
 const getToken = async (code: string) => {
   try {
-    // throw new Error('test');
     const tokenRes = await axios.post(`https://${process.env.AUTH0_DOMAIN}/oauth/token`, {
       grant_type: 'authorization_code',
       client_id: process.env.AUTH0_CLIENT_ID,
