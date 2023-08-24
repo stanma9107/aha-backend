@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { EventType } from '@prisma/client';
+import { EventType, UserSource } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import {
   badRequest,
@@ -101,6 +101,7 @@ export default async (req: FastifyRequest, res: FastifyReply) => {
     },
     include: {
       session: true,
+      user: true,
     },
   });
 
@@ -110,7 +111,10 @@ export default async (req: FastifyRequest, res: FastifyReply) => {
     });
   }
 
+  const canChangePassword = (activeSession.user.source === UserSource.EMAIL);
+
   return success(res, {
     isVerified: activeSession.session.verified,
+    canChangePassword: activeSession.session.verified && canChangePassword,
   });
 };
