@@ -82,8 +82,8 @@ export default async (req: FastifyRequest, res: FastifyReply) => {
 
     // Store session id in cookie
     res.setCookie('session_id', activeSession.active_id, {
-      sameSite: true,
-      secure: (process.env.ENV !== 'development'),
+      sameSite: 'none',
+      secure: false,
       httpOnly: true,
       path: '/',
     });

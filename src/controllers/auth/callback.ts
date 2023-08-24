@@ -18,9 +18,9 @@ export default async (req: FastifyRequest<{
   if (token.isValid) {
     // Set cookie for access_token
     res.setCookie('access_token', token.idToken, {
-      sameSite: true,
+      sameSite: 'none',
+      secure: false,
       httpOnly: true,
-      secure: process.env.ENV !== 'development',
       path: '/',
       expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
     });
@@ -115,9 +115,9 @@ export default async (req: FastifyRequest<{
 
     // Store session id in cookie
     res.setCookie('session_id', activeSession.active_id, {
-      sameSite: true,
       httpOnly: true,
-      secure: process.env.ENV !== 'development',
+      sameSite: 'none',
+      secure: false,
       path: '/',
     });
   }
