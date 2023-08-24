@@ -1,0 +1,350 @@
+openapi: 3.0.3
+info:
+  title: Member Portal API
+  description: An API for member portal functionality with Auth0 integration
+  version: 1.0.0
+paths:
+  /auth/login:
+    get:
+      tags:
+        - auth
+      summary: Redirect to login page
+      responses:
+        '302':
+          description: Redirect to login page
+          headers:
+            Location:
+              schema:
+                type: string
+  /auth/check:
+    get:
+      tags:
+        - auth
+      security:
+        - cookieAuth: []
+        - sessionAuth: []
+      summary: Check user login status and details
+      responses:
+        '200':
+          description: User is logged in
+          content:
+            application/json:
+              example:
+                isVerified: true
+                canChangePassword: true
+        '401':
+          description: User is not logged in
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+        '403':
+          description: Access forbidden
+          content:
+            application/json:
+              example:
+                message: Forbidden
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              example:
+                message: Internal server error
+  /auth/callback:
+    get:
+      tags:
+        - auth
+      summary: Handle Auth0 callback after user login
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to frontend
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: access_token=jwtToken; Path=/; HttpOnly
+            Location:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              example:
+                message: Internal server error
+  /auth/resend:
+    post:
+      tags:
+        - auth
+      security:
+        - cookieAuth: []
+        - sessionAuth: []
+      summary: Resend verification email
+      responses:
+        '200':
+          description: Email sent
+          content:
+            application/json:
+              example:
+                message: Email sent.
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              example:
+                message: Bad request
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              example:
+                message: Forbidden
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              example:
+                message: Internal server error
+  /auth/verify/{VerificationToken}:
+    get:
+      tags:
+        - auth
+      summary: Verify session using verification token
+      parameters:
+        - name: VerificationToken
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Verify the session, and redirect to frontend
+          headers:
+            Location:
+              schema:
+                type: string
+        '400':
+          description: Bad request, verification token is not valid
+          content:
+            application/json:
+              example:
+                message: Bad request
+  /auth/logout:
+    get:
+      tags:
+        - auth
+      summary: Logout and redirect to Auth0 logout
+      responses:
+        '302':
+          description: Redirect to Auth0 logout
+          headers:
+            Location:
+              schema:
+                type: string
+  /member:
+    get:
+      tags:
+        - member
+      security:
+        - cookieAuth: []
+        - sessionAuth: []
+      summary: Get user profile
+      responses:
+        '200':
+          description: User profile retrieved
+          content:
+            application/json:
+              example:
+                name: John Doe
+                picture: https://example.com/avatar.jpg
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+        '403':
+          description: Access forbidden
+          content:
+            application/json:
+              example:
+                message: Access forbidden
+    put:
+      tags:
+        - member
+      security:
+        - cookieAuth: []
+        - sessionAuth: []
+      summary: Update user nickname
+      requestBody:
+        description: User profile update data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              example:
+                message: Profile updated.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+        '403':
+          description: Access forbidden
+          content:
+            application/json:
+              example:
+                message: Access forbidden
+  /member/update-password:
+    post:
+      tags:
+        - member
+      security:
+        - cookieAuth: []
+        - sessionAuth: []
+      summary: Update user password
+      requestBody:
+        description: User password update data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldPassword:
+                  type: string
+                newPassword:
+                  type: string
+                newPasswordAgain:
+                  type: string
+              required:
+                - oldPassword
+                - newPassword
+                - newPasswordAgain
+      responses:
+        '200':
+          description: Password changed successfully
+          content:
+            application/json:
+              example:
+                message: Password changed successfully.
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              example:
+                message: Error reason (string)
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+        '403':
+          description: Access forbidden
+          content:
+            application/json:
+              example:
+                message: Access forbidden
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              example:
+                message: Internal server error
+  /dashboard/users:
+    get:
+      tags:
+        - dashboard
+      security:
+        - cookieAuth: []
+        - sessionAuth: []
+      summary: Get user list in dashboard
+      responses:
+        '200':
+          description: User list retrieved
+          content:
+            application/json:
+              example: |
+                [
+                  {
+                    "id": 123,
+                    "name": "John Doe",
+                    "email": "john@example.com",
+                    "source": "Google",
+                    "created_at": "2023-08-24T12:00:00Z",
+                    "login_count": 15,
+                    "last_login": "2023-08-23T14:30:00Z"
+                  },
+                  {
+                    "id": 456,
+                    "name": "Jane Smith",
+                    "email": "jane@example.com",
+                    "source": "Email",
+                    "created_at": "2023-08-20T09:45:00Z",
+                    "login_count": 7,
+                    "last_login": "2023-08-23T09:00:00Z"
+                  }
+                ]
+        '401':
+          description: Unauthorized
+        '403':
+          description: Access forbidden
+  /dashboard/statistics:
+    get:
+      tags:
+        - dashboard
+      security:
+        - cookieAuth: []
+        - sessionAuth: []
+      summary: Get users statistics
+      responses:
+        '200':
+          description: Dashboard statistics retrieved
+          content:
+            application/json:
+              example:
+                signUpCount: 500
+                todayActiveSession: 120
+                avarageLastSevenDaysActiveSessionRolling: 72.1
+        '401':
+          description: Unauthorized
+        '403':
+          description: Access forbidden
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: access_token
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: session_id
+servers:
+  - url: https://aha-api.stanma.dev
+    variables: {}
