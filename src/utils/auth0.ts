@@ -57,6 +57,59 @@ const validateToken = (token: string) => {
   }
 };
 
+const getManagementToken = async () => {
+  try {
+    const tokenRes = await axios.post(`https://${process.env.AUTH0_DOMAIN}/oauth/token`, {
+      client_id: process.env.AUTH0_MANAGEMENT_CLIENT_ID,
+      client_secret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET,
+      audience: `https://${process.env.AUTH0_DOMAIN}/api/v2/`,
+      grant_type: 'client_credentials',
+    });
+    return {
+      isValid: true,
+      token: tokenRes.data.access_token,
+    };
+  } catch (err) {
+    return {
+      isValid: false,
+    };
+  }
+};
+
+const validatePassword = async (username: string, password: string) => {
+  try {
+    await axios.post(`https://${process.env.AUTH0_DOMAIN}/oauth/token`, {
+      grant_type: 'password',
+      client_id: process.env.AUTH0_CLIENT_ID,
+      username,
+      password,
+    });
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
+
+const changePassword = async (userId: string, password: string) => {
+  try {
+    const managementToken = await getManagementToken();
+    if (managementToken.isValid === false) {
+      return false;
+    }
+    await axios.patch(`https://${process.env.AUTH0_DOMAIN}/api/v2/users/${userId}`, {
+      password,
+      connection: process.env.AUTH0_CONNECTION,
+    }, {
+      headers: {
+        Authorization: `Bearer ${managementToken.token}`,
+      },
+    });
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
+
 const decodeToken = (token: string) => {
   const decoded = jwt.decode(token) as JwtPayload;
   return {
@@ -77,9 +130,25 @@ const getSource = (source: string) => {
   }
 };
 
+const reverseSource = (source: string) => {
+  switch (source) {
+    case 'EMAIL':
+      return 'auth0';
+    case 'GOOGLE':
+      return 'google-oauth2';
+    case 'FACEBOOK':
+      return 'facebook';
+    default:
+      return 'auth0';
+  }
+};
+
 export default {
   getToken,
   validateToken,
   decodeToken,
   getSource,
+  reverseSource,
+  validatePassword,
+  changePassword,
 };

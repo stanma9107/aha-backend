@@ -7,6 +7,7 @@ const authRoutes: FastifyPluginCallback = async (fastify, _otps, done) => {
 
   fastify.get('/', memberController.getProfile);
   fastify.put('/', memberController.updateProfile);
+  fastify.post('/change-password', memberController.changePassword);
   done();
 };
 
